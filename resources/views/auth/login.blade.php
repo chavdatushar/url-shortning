@@ -39,7 +39,12 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                alert(response.message);
+                if (response.success) {
+                    alert(response.message);
+                    window.location.href = '{{ route('urls.index') }}';
+                } else {
+                    alert(response.message);
+                }
             },
             error: function(xhr) {
                 alert(xhr.responseJSON.message);

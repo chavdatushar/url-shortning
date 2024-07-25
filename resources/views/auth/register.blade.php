@@ -20,7 +20,7 @@
                 </div>
                 <div class="md-3">
                     <label class="form-label">Password</label>
-                    {!! Form::password('password', ['class' => 'form-control']) !!}
+                    {!! Form::password('password', ['class' => 'form-control','id'=>"password"]) !!}
                 </div>
                 <div class="md-3">
                     <label class="form-label">Confirm Password</label>
@@ -35,27 +35,67 @@
 @endsection
 
 @section('scripts')
+
 <script>
-    $(document).ready(function(){
-        $('#register-form').on('submit', function(event) {
-        event.preventDefault();
-        $.ajax({
-            url: '{{ route('do-register') }}',
-            method: 'POST',
-            data: $(this).serialize(),
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    $(document).ready(function() {
+        $('#register-form').validate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 3
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                password: {
+                    required: true,
+                    minlength: 6
+                },
+                password_confirmation: {
+                    required: true,
+                    minlength: 6,
+                    equalTo: '#password'
+                }
             },
-            success: function(response) {
-                alert(response.message);
-                window.location.href = '{{ route('register') }}';
+            messages: {
+                name: {
+                    required: "Please enter your name",
+                    minlength: "Your name must be at least 3 characters long"
+                },
+                email: "Please enter a valid email address",
+                password: {
+                    required: "Please provide a password",
+                    minlength: "Your password must be at least 6 characters long"
+                },
+                password_confirmation: {
+                    required: "Please confirm your password",
+                    minlength: "Your password confirmation must be at least 6 characters long",
+                    equalTo: "Password and confirmation do not match"
+                }
             },
-            error: function(xhr) {
-                alert(xhr.responseJSON.message);
+            submitHandler: function(form) {
+                $.ajax({
+                    url: '{{ route('do-register') }}',
+                    method: 'POST',
+                    data: $(form).serialize(),
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.href = '{{ route('login') }}';
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responseJSON.message);
+                    }
+                });
             }
         });
     });
-    })
     
 </script>
 @endsection
